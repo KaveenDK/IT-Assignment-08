@@ -10,14 +10,19 @@ let orders = [];
 function addCustomer(id, name, address, salary) {
     if (validateCustomer(id, name, address, salary)) {
         customers.push({ id, name, address, salary });
-        return true;
+        return { success: true, message: "Customer added successfully." };
     }
-    return false;
+    return { success: false, message: "Invalid customer data." };
 }
 
 // Search Customer
 function searchCustomer(id) {
     return customers.find(customer => customer.id === id);
+}
+
+// Get All Customers
+function getAllCustomers() {
+    return customers;
 }
 
 // Validate Customer Fields
@@ -30,14 +35,19 @@ function validateCustomer(id, name, address, salary) {
 function addItem(code, name, qty, price) {
     if (validateItem(code, name, qty, price)) {
         items.push({ code, name, qty: parseInt(qty), price: parseFloat(price) });
-        return true;
+        return { success: true, message: "Item added successfully." };
     }
-    return false;
+    return { success: false, message: "Invalid item data." };
 }
 
 // Search Item
 function searchItem(code) {
     return items.find(item => item.code === code);
+}
+
+// Get All Items
+function getAllItems() {
+    return items;
 }
 
 // Validate Item Fields
@@ -52,23 +62,25 @@ function generateOrderId() {
 }
 
 // Add Order
-function addOrder(customerId, itemCode, qty, discount) {
+function addOrder(customerId, orderItems) {
     let customer = searchCustomer(customerId);
-    let item = searchItem(itemCode);
+    if (!customer) return { success: false, message: "Customer not found." };
 
-    if (!customer || !item) return false;
-    if (item.qty < qty) return false; // Check available stock
+    for (let orderItem of orderItems) {
+        let item = searchItem(orderItem.itemCode);
+        if (!item) return { success: false, message: `Item ${orderItem.itemCode} not found.` };
+        if (item.qty < orderItem.qty) return { success: false, message: `Insufficient stock for item ${orderItem.itemCode}.` };
+
+        // Reduce stock quantity
+        item.qty -= orderItem.qty;
+    }
 
     let orderId = generateOrderId();
-    let total = qty * item.price;
-    let finalTotal = total - (total * (discount / 100));
-
-    // Reduce stock quantity
-    item.qty -= qty;
+    let total = orderItems.reduce((sum, item) => sum + item.total, 0);
 
     // Save order
-    orders.push({ orderId, customerId, itemCode, qty, total: finalTotal });
-    return orderId;
+    orders.push({ orderId, customerId, orderItems, total });
+    return { success: true, message: `Order ${orderId} placed successfully.` };
 }
 
 // Search Order
@@ -82,4 +94,4 @@ function getTotalOrderValue() {
 }
 
 // === EXPORT FUNCTIONS FOR UI ===
-export { addCustomer, searchCustomer, addItem, searchItem, addOrder, searchOrder, getTotalOrderValue };
+export { addCustomer, searchCustomer, getAllCustomers, addItem, searchItem, getAllItems, addOrder, searchOrder, getTotalOrderValue };

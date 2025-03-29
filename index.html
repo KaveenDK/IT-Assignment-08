@@ -15,7 +15,7 @@
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg" style="background-color: #007bff">
       <div class="container-fluid">
-        <a class="navbar-brand text-white" href="#">POS System</a>
+        <a class="navbar-brand text-white" href="#">POS System Dashboard</a>
         <button
           class="navbar-toggler"
           type="button"
@@ -131,13 +131,26 @@
               <span class="error text-danger" id="customer-salary-error"></span>
             </div>
             <div class="d-flex gap-2 flex-wrap">
-              <button type="button" class="btn btn-primary">
+              <button type="button" class="btn btn-primary" id="save-customer">
                 Save Customer
               </button>
-              <button type="button" class="btn btn-danger">Remove</button>
-              <button type="button" class="btn btn-warning">Update</button>
-              <button type="button" class="btn btn-success">Get All</button>
-              <button type="button" class="btn btn-secondary">Clear All</button>
+              <button
+                type="button"
+                class="btn btn-warning"
+                id="update-customer"
+              >
+                Update
+              </button>
+              <button type="button" class="btn btn-danger" id="remove-customer">
+                Remove
+              </button>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                id="search-customer"
+              >
+                Search
+              </button>
             </div>
           </form>
         </div>
@@ -195,11 +208,25 @@
               <span class="error text-danger" id="item-price-error"></span>
             </div>
             <div class="d-flex gap-2 flex-wrap">
-              <button type="button" class="btn btn-primary">Add Item</button>
-              <button type="button" class="btn btn-danger">Remove</button>
-              <button type="button" class="btn btn-warning">Update</button>
-              <button type="button" class="btn btn-success">Get All</button>
-              <button type="button" class="btn btn-secondary">Clear All</button>
+              <button type="button" class="btn btn-primary" id="save-item">
+                Add Item
+              </button>
+              <button type="button" class="btn btn-danger" id="remove-item">
+                Remove
+              </button>
+              <button type="button" class="btn btn-warning" id="update-item">
+                Update
+              </button>
+              <button type="button" class="btn btn-success" id="get-all-items">
+                Get All
+              </button>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                id="clear-all-items"
+              >
+                Clear All
+              </button>
             </div>
           </form>
         </div>
@@ -378,15 +405,15 @@
     </section>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/script.js"></script>
-    <script src="/db/DB.js"></script>
-    <script src="/controller/IndexController.js"></script>
-    <script src="/controller/CustomerController.js"></script>
-    <script src="/controller/ItemController.js"></script>
-    <script src="/controller/OrderController.js"></script>
-    <script src="/model/Customer.js"></script>
-    <script src="/model/Item.js"></script>
-    <script src="/model/Order.js"></script>
-    <script src="/model/OrderDetails.js"></script>
+    <script type="module" src="/js/script.js"></script>
+    <script type="module" src="/db/DB.js"></script>
+    <script type="module" src="/controller/IndexController.js"></script>
+    <script type="module" src="/controller/CustomerController.js"></script>
+    <script type="module" src="/controller/ItemController.js"></script>
+    <script type="module" src="/controller/OrderController.js"></script>
+    <script type="module" src="/model/Customer.js"></script>
+    <script type="module" src="/model/Item.js"></script>
+    <script type="module" src="/model/Order.js"></script>
+    <script type="module" src="/model/OrderDetails.js"></script>
   </body>
 </html>
