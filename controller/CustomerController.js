@@ -65,20 +65,20 @@ export function getAllCustomers() {
 function validateCustomer(id, name, address, salary) {
     let isValid = true;
 
-    if (!id || id.trim() === "") {
-        console.error("Customer ID is required.");
+    if (!/^C\d{2}-\d{3}$/.test(id)) {
+        console.error("Customer ID is required and must follow the pattern C00-000.");
         isValid = false;
     }
-    if (!name || name.trim() === "") {
-        console.error("Customer Name is required.");
+    if (!/^.{5,20}$/.test(name)) {
+        console.error("Customer Name is required: Minimum 5, Maximum 20 characters.");
         isValid = false;
     }
-    if (!address || address.trim() === "") {
-        console.error("Customer Address is required.");
+    if (!/^.{7,}$/.test(address)) {
+        console.error("Customer Address is required: Minimum 7 characters.");
         isValid = false;
     }
-    if (!salary || isNaN(salary) || parseFloat(salary) <= 0) {
-        console.error("Valid Customer Salary is required.");
+    if (!/^\d+(\.\d{2})?$/.test(salary)) {
+        console.error("Customer Salary is required and must follow the pattern 100.00 or 100.");
         isValid = false;
     }
 

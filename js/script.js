@@ -18,9 +18,31 @@ document.addEventListener("DOMContentLoaded", () => {
     const navItem = document.getElementById("nav-item");
     const navOrders = document.getElementById("nav-orders");
 
-    if (navHome) navHome.addEventListener("click", () => showSection("home-section"));
-    if (navCustomer) navCustomer.addEventListener("click", () => showSection("customer-section"));
-    if (navItem) navItem.addEventListener("click", () => showSection("item-section"));
-    if (navOrders) navOrders.addEventListener("click", () => showSection("order-section"));
+    if (navHome) {
+        navHome.addEventListener("click", () => {
+            document.title = "Dashboard";
+            showSection("home-section");
+        });
+    }
 
+    if (navCustomer) {
+        navCustomer.addEventListener("click", () => {
+            document.title = "Customer Manage";
+            showSection("customer-section");
+        });
+    }
+
+    if (navItem) {
+        navItem.addEventListener("click", () => {
+            document.title = "Item Manage";
+            showSection("item-section");
+        });
+    }
+
+    if (navOrders) {
+        navOrders.addEventListener("click", () => {
+            document.title = "Order Manage";
+            showSection("order-section");
+        });
+    }
 });
