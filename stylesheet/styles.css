@@ -21,8 +21,9 @@ body {
   }
   
   .card-body i {
+    font-size: 2rem;
     color: #007bff;
-  }
+}
   
   .card-body h3 {
     margin-top: 10px;
