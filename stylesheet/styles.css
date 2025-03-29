@@ -101,3 +101,12 @@ body {
     color: red;
     margin-top: 5px;
  }
+
+ .is-invalid {
+  border: 2px solid red;
+ }
+
+ .table-row-selected {
+  background-color: #d1ecf1;
+  cursor: pointer;
+ }
