@@ -94,4 +94,14 @@ function getTotalOrderValue() {
 }
 
 // === EXPORT FUNCTIONS FOR UI ===
-export { addCustomer, searchCustomer, getAllCustomers, addItem, searchItem, getAllItems, addOrder, searchOrder, getTotalOrderValue };
+export { 
+    addCustomer, 
+    searchCustomer, 
+    getAllCustomers, 
+    addItem, 
+    searchItem, 
+    getAllItems, 
+    addOrder, 
+    searchOrder, 
+    getTotalOrderValue 
+};

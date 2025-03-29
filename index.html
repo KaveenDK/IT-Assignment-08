@@ -15,7 +15,7 @@
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg" style="background-color: #007bff">
       <div class="container-fluid">
-        <a class="navbar-brand text-white" href="#">POS System Dashboard</a>
+        <a class="navbar-brand text-white" href="#">Dashboard</a>
         <button
           class="navbar-toggler"
           type="button"
@@ -96,14 +96,19 @@
 
     <!-- Customer Manage Section -->
     <section id="customer-section" class="container mt-4 hidden">
-      <h2 class="text-center mb-4">Customer Registration</h2>
+      <h2 class="text-center mb-4">Customer Manage</h2>
       <div class="row">
         <!-- Form Section -->
         <div class="col-md-4">
           <form id="customer-form">
             <div class="mb-3">
               <label for="customer-id" class="form-label">Customer ID</label>
-              <input type="text" class="form-control" id="customer-id" />
+              <input
+                type="text"
+                class="form-control"
+                id="customer-id"
+                placeholder="Pattern: C00-000"
+              />
               <span class="error text-danger" id="customer-id-error"></span>
             </div>
             <div class="mb-3">
@@ -127,12 +132,20 @@
               <label for="customer-salary" class="form-label"
                 >Customer Salary</label
               >
-              <input type="number" class="form-control" id="customer-salary" />
+              <input
+                type="text"
+                class="form-control"
+                id="customer-salary"
+                placeholder="Pattern: 100.00 or 100"
+              />
               <span class="error text-danger" id="customer-salary-error"></span>
             </div>
             <div class="d-flex gap-2 flex-wrap">
               <button type="button" class="btn btn-primary" id="save-customer">
                 Save Customer
+              </button>
+              <button type="button" class="btn btn-danger" id="remove-customer">
+                Remove
               </button>
               <button
                 type="button"
@@ -141,15 +154,19 @@
               >
                 Update
               </button>
-              <button type="button" class="btn btn-danger" id="remove-customer">
-                Remove
+              <button
+                type="button"
+                class="btn btn-success"
+                id="get-all-customers"
+              >
+                Get All
               </button>
               <button
                 type="button"
                 class="btn btn-secondary"
-                id="search-customer"
+                id="clear-all-fields"
               >
-                Search
+                Clear All
               </button>
             </div>
           </form>
