@@ -3,69 +3,100 @@ body {
     margin: 0;
     padding: 0;
     background: #f4f4f4;
-}
-
-.navbar {
+  }
+  
+  .navbar {
     background: #007bff;
     color: white;
-    padding: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.navbar ul {
-    list-style: none;
-    display: flex;
-    gap: 20px;
-}
-
-.navbar a {
-    color: white;
-    text-decoration: none;
-    font-size: 18px;
-}
-
-section {
-    padding: 20px;
-}
-
-.hidden {
-    display: none;
-}
-
-.form-container {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    max-width: 300px;
-}
-
-button {
-    background: #007bff;
-    color: white;
+  }
+  
+  .card {
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .card-header {
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+  
+  .card-body i {
+    color: #007bff;
+  }
+  
+  .card-body h3 {
+    margin-top: 10px;
+    font-size: 1.5rem;
+  }
+  
+  .btn-danger {
+    background-color: #ff4d4d;
     border: none;
-    padding: 10px;
-    cursor: pointer;
-}
-
-button:hover {
-    background: #0056b3;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-}
-
-th, td {
+  }
+  
+  .btn-danger:hover {
+    background-color: #e60000;
+  }
+  
+  h2 {
+    font-weight: bold;
+  }
+  
+  .table-bordered {
     border: 1px solid #ddd;
-    padding: 10px;
-    text-align: left;
-}
-
-th {
-    background: #ff4d4d;
+  }
+  
+  .table-primary {
+    background-color: #007bff;
     color: white;
-}
+  }
+  
+  .table-success {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .btn {
+    width: 120px;
+  }
+  
+  form .form-control {
+    border-radius: 5px;
+  }
+  
+  form .btn {
+    margin-top: 10px;
+  }
+  
+  .d-flex.flex-wrap {
+    gap: 10px;
+  }
+  
+  small.text-danger {
+    font-size: 0.8rem;
+  }
+  
+  .text-primary {
+    font-weight: bold;
+    color: #007bff;
+  }
+  
+  .text-danger {
+    font-weight: bold;
+    color: #dc3545;
+  }
+  
+ .btn-success {
+    width: 100%;
+    margin-top: 10px;
+ }
+
+ .hidden {
+    display: none;
+ }
+ 
+ .error {
+    font-size: 0.9rem;
+    color: red;
+    margin-top: 5px;
+ }
