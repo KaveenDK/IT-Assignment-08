@@ -66,6 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log("Orders link clicked");
             updateNavBarTitle("Order Manage");
             showSection("order-section");
+            initializeOrderForm();
         });
     } else {
         console.error("Element with ID 'nav-orders' not found.");

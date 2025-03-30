@@ -17,6 +17,15 @@ import {
     validateItemForm,
 } from "./ItemController.js";
 
+import {
+    generateOrderId,
+    addOrder,
+    calculateTotal,
+    getAllOrders,
+} from "./OrderController.js";
+
+import { OrderDetails } from "../model/OrderDetails.js";
+
 // === CUSTOMER MANAGEMENT ===
 
 // Save Customer
@@ -32,6 +41,7 @@ document.getElementById("save-customer").addEventListener("click", () => {
             alert(result.message);
             updateCustomerTable();
             clearCustomerForm();
+            populateCustomerDropdown();
         } else {
             alert(result.message);
         }
@@ -228,6 +238,7 @@ document.getElementById("save-item").addEventListener("click", () => {
             alert(result.message);
             updateItemTable();
             clearItemForm();
+            populateItemDropdown();
         } else {
             alert(result.message);
         }
@@ -290,7 +301,7 @@ document.getElementById("clear-all-items").addEventListener("click", () => {
 // Update Item Table
 function updateItemTable() {
     const itemTableBody = document.getElementById("item-table");
-    itemTableBody.innerHTML = ""; // Clear existing rows
+    itemTableBody.innerHTML = "";
 
     const items = getAllItems();
     items.forEach((item) => {
@@ -343,3 +354,201 @@ function clearItemForm() {
     document.getElementById("item-qty-error").textContent = "";
     document.getElementById("item-price-error").textContent = "";
 }
+
+// === ORDER MANAGEMENT ===
+
+// Populate Customer Dropdown
+function populateCustomerDropdown() {
+    const customerDropdown = document.getElementById("order-customer-id");
+    customerDropdown.innerHTML = `<option>Select Customer</option>`;
+
+    const customers = getAllCustomers();
+    customers.forEach((customer) => {
+        const option = document.createElement("option");
+        option.value = customer.id;
+        option.textContent = `${customer.id} - ${customer.name}`;
+        customerDropdown.appendChild(option);
+    });
+}
+
+// Populate Item Dropdown
+function populateItemDropdown() {
+    const itemDropdown = document.getElementById("item-code");
+    if (!itemDropdown) {
+        console.error("Item dropdown not found!");
+        return;
+    }
+
+    // Clear existing options
+    itemDropdown.innerHTML = `<option>Select Item Code</option>`;
+
+    // Fetch all items
+    const items = getAllItems();
+    console.log("Items in populateItemDropdown:", items);
+
+    // Populate dropdown with items
+    items.forEach((item) => {
+        const option = document.createElement("option");
+        option.value = item.code;
+        option.textContent = `${item.code} - ${item.name}`;
+        console.log("Appending Option:", option);
+        itemDropdown.appendChild(option);
+    });
+}
+
+// Handle Customer Selection
+document.getElementById("order-customer-id").addEventListener("change", () => {
+    const customerId = document.getElementById("order-customer-id").value;
+    const customer = searchCustomer(customerId);
+
+    if (customer) {
+        // Populate the Name and Address fields
+        document.getElementById("customer-name").value = customer.name;
+        document.getElementById("customer-address").value = customer.address;
+    } else {
+        // Clear the fields if no customer is found
+        document.getElementById("customer-name").value = "";
+        document.getElementById("customer-address").value = "";
+    }
+});
+
+// Handle Item Selection
+document.getElementById("item-code").addEventListener("change", () => {
+    const itemCode = document.getElementById("item-code").value;
+    const item = searchItem(itemCode);
+
+    if (item) {
+        document.getElementById("item-name").value = item.name;
+        document.getElementById("item-price").value = item.price;
+    } else {
+        document.getElementById("item-name").value = "";
+        document.getElementById("item-price").value = "";
+    }
+});
+
+// Add Item to Order Table
+document.getElementById("add-order-item").addEventListener("click", () => {
+    const itemCode = document.getElementById("item-code").value;
+    const itemName = document.getElementById("item-name").value;
+    const itemPrice = parseFloat(document.getElementById("item-price").value);
+    const orderQty = parseInt(document.getElementById("order-qty").value);
+
+    if (!itemCode || !itemName || isNaN(itemPrice) || isNaN(orderQty) || orderQty <= 0) {
+        alert("Please select a valid item and enter a valid quantity.");
+        return;
+    }
+
+    const item = searchItem(itemCode);
+    if (item && orderQty > item.qty) {
+        alert("Insufficient stock for the selected item.");
+        return;
+    }
+
+    const orderTable = document.getElementById("order-table");
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+        <td>${itemCode}</td>
+        <td>${itemName}</td>
+        <td>${itemPrice.toFixed(2)}</td>
+        <td>${orderQty}</td>
+        <td>${(itemPrice * orderQty).toFixed(2)}</td>
+    `;
+
+    orderTable.appendChild(row);
+
+    updateOrderSummary();
+    clearItemSelection();
+});
+
+// Update Order Summary
+function updateOrderSummary() {
+    const orderTable = document.getElementById("order-table");
+    const rows = orderTable.querySelectorAll("tr");
+
+    let total = 0;
+    rows.forEach((row) => {
+        const subTotal = parseFloat(row.cells[4].textContent);
+        total += subTotal;
+    });
+
+    document.getElementById("order-total").textContent = `${total.toFixed(2)}Rs/=`;
+    document.getElementById("order-subtotal").textContent = `${total.toFixed(2)}Rs/=`;
+}
+
+// Clear Item Selection
+function clearItemSelection() {
+    document.getElementById("item-code").value = "";
+    document.getElementById("item-name").value = "";
+    document.getElementById("item-price").value = "";
+    document.getElementById("order-qty").value = "";
+}
+
+// Place Order
+document.getElementById("place-order").addEventListener("click", () => {
+    const customerId = document.getElementById("order-customer-id").value;
+    const orderTable = document.getElementById("order-table");
+    const rows = orderTable.querySelectorAll("tr");
+    console.log("Customer ID:", customerId);
+    console.log("Order Rows:", rows);
+    const discount = parseFloat(document.getElementById("discount").value) || 0;
+    const cash = parseFloat(document.getElementById("cash").value) || 0;
+
+    if (!customerId || rows.length === 0) {
+        alert("Please select a customer and add items to the order.");
+        return;
+    }
+
+    const orderDetails = [];
+    rows.forEach((row) => {
+        const itemCode = row.cells[0].textContent;
+        const itemName = row.cells[1].textContent;
+        const qty = parseInt(row.cells[3].textContent);
+        const unitPrice = parseFloat(row.cells[2].textContent);
+        orderDetails.push(new OrderDetails(itemCode, itemName, qty, unitPrice));
+    });
+
+    console.log("Order Details:", orderDetails);
+    const total = calculateTotal(orderDetails, discount);
+    if (cash < total) {
+        alert("Insufficient cash to complete the purchase.");
+        return;
+    }
+
+    const orderId = addOrder(customerId, orderDetails, discount);
+    if (orderId) {
+        alert(`Order placed successfully! Order ID: ${orderId}`);
+        clearOrderForm();
+    } else {
+        alert("Failed to place the order. Please try again.");
+    }
+});
+
+// Clear Order Form
+function clearOrderForm() {
+    document.getElementById("order-id").value = generateOrderId();
+    document.getElementById("order-date").value = "";
+    document.getElementById("order-customer-id").value = "";
+    document.getElementById("customer-name").value = "";
+    document.getElementById("customer-address").value = "";
+    document.getElementById("item-code").value = "";
+    document.getElementById("item-name").value = "";
+    document.getElementById("item-price").value = "";
+    document.getElementById("order-qty").value = "";
+    document.getElementById("cash").value = "";
+    document.getElementById("discount").value = "";
+    document.getElementById("balance").value = "";
+    document.getElementById("order-total").textContent = "00.00Rs/=";
+    document.getElementById("order-subtotal").textContent = "00.00Rs/=";
+    document.getElementById("order-table").innerHTML = "";
+}
+
+// Initialize Order Form
+function initializeOrderForm() {
+    document.getElementById("order-id").value = generateOrderId();
+    populateCustomerDropdown();
+    populateItemDropdown();
+}
+
+// Call initializeOrderForm when the page loads
+initializeOrderForm();

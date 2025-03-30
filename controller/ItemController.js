@@ -11,7 +11,7 @@ export function addItem(code, name, qty, price) {
         if (!searchItem(code)) {
             const newItem = new Item(code, name, qty, price);
             items.push(newItem);
-            console.log("Item added successfully:", newItem);
+            console.log("Items after adding:", items);
             return { success: true, message: "Item added successfully." };
         } else {
             return { success: false, message: "Item Code already exists." };
@@ -56,8 +56,9 @@ export function removeItem(code) {
     }
 }
 
-// Get All Items
+// ItemController.js
 export function getAllItems() {
+    console.log("Items in getAllItems:", items);
     return items;
 }
 

@@ -278,25 +278,24 @@
               <form>
                 <div class="mb-3">
                   <label for="order-id" class="form-label">Order ID</label>
-                  <input type="text" class="form-control" id="order-id" />
-                  <span class="error text-danger" id="order-id-error"></span>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="order-id"
+                    disabled
+                  />
                 </div>
                 <div class="mb-3">
                   <label for="order-date" class="form-label">Date</label>
                   <input type="date" class="form-control" id="order-date" />
-                  <span class="error text-danger" id="order-date-error"></span>
                 </div>
                 <div class="mb-3">
-                  <label for="customer-id" class="form-label"
+                  <label for="order-customer-id" class="form-label"
                     >Customer ID</label
                   >
                   <select class="form-select" id="order-customer-id">
                     <option>Select Customer</option>
                   </select>
-                  <span
-                    class="error text-danger"
-                    id="order-customer-id-error"
-                  ></span>
                 </div>
                 <div class="mb-3">
                   <label for="customer-name" class="form-label">Name</label>
@@ -376,14 +375,20 @@
           <div class="card">
             <div class="card-header bg-success text-white">Summary</div>
             <div class="card-body">
-              <p>Total: <span class="text-primary">00.00Rs/=</span></p>
-              <p>SubTotal: <span class="text-danger">00.00Rs/=</span></p>
+              <p>
+                Total:
+                <span id="order-total" class="text-primary">00.00Rs/=</span>
+              </p>
+              <p>
+                SubTotal:
+                <span id="order-subtotal" class="text-danger">00.00Rs/=</span>
+              </p>
               <div class="mb-3">
                 <label for="cash" class="form-label">Cash</label>
                 <input type="number" class="form-control" id="cash" />
               </div>
               <div class="mb-3">
-                <label for="discount" class="form-label">Discount</label>
+                <label for="discount" class="form-label">Discount (%)</label>
                 <input type="number" class="form-control" id="discount" />
               </div>
               <div class="mb-3">
