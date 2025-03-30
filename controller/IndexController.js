@@ -1,8 +1,23 @@
 console.log("indexController.js is loaded.....");
 
-import { addCustomer, searchCustomer, getAllCustomers, removeCustomer, updateCustomer } from "./CustomerController.js";
+import {
+    addCustomer,
+    searchCustomer,
+    getAllCustomers,
+    removeCustomer,
+    updateCustomer,
+} from "./CustomerController.js";
 
-// === UI INTERACTIONS ===
+import {
+    addItem,
+    searchItem,
+    getAllItems,
+    removeItem,
+    updateItem,
+    validateItemForm,
+} from "./ItemController.js";
+
+// === CUSTOMER MANAGEMENT ===
 
 // Save Customer
 document.getElementById("save-customer").addEventListener("click", () => {
@@ -196,4 +211,135 @@ function validateCustomerForm() {
     document.getElementById("save-customer").disabled = !isValid;
 
     return isValid;
+}
+
+// === ITEM MANAGEMENT ===
+
+// Save Item
+document.getElementById("save-item").addEventListener("click", () => {
+    const code = document.getElementById("item-code").value.trim();
+    const name = document.getElementById("item-name").value.trim();
+    const qty = document.getElementById("item-qty").value.trim();
+    const price = document.getElementById("item-price").value.trim();
+
+    if (validateItemForm()) {
+        const result = addItem(code, name, qty, price);
+        if (result.success) {
+            alert(result.message);
+            updateItemTable();
+            clearItemForm();
+        } else {
+            alert(result.message);
+        }
+    }
+});
+
+// Remove Item
+document.getElementById("remove-item").addEventListener("click", () => {
+    const code = document.getElementById("item-code").value.trim();
+
+    if (!code) {
+        alert("Please enter an Item Code to remove.");
+        return;
+    }
+
+    const result = removeItem(code);
+    if (result.success) {
+        alert(result.message);
+        updateItemTable();
+        clearItemForm();
+    } else {
+        alert(result.message);
+    }
+});
+
+// Update Item
+document.getElementById("update-item").addEventListener("click", () => {
+    const code = document.getElementById("item-code").value.trim();
+    const name = document.getElementById("item-name").value.trim();
+    const qty = document.getElementById("item-qty").value.trim();
+    const price = document.getElementById("item-price").value.trim();
+
+    if (!code) {
+        alert("Please enter an Item Code to update.");
+        return;
+    }
+
+    if (validateItemForm()) {
+        const result = updateItem(code, name, qty, price);
+        if (result.success) {
+            alert(result.message);
+            updateItemTable();
+            clearItemForm();
+        } else {
+            alert(result.message);
+        }
+    }
+});
+
+// Get All Items
+document.getElementById("get-all-items").addEventListener("click", () => {
+    updateItemTable();
+});
+
+// Clear All Item Fields
+document.getElementById("clear-all-items").addEventListener("click", () => {
+    clearItemForm();
+});
+
+// Update Item Table
+function updateItemTable() {
+    const itemTableBody = document.getElementById("item-table");
+    itemTableBody.innerHTML = ""; // Clear existing rows
+
+    const items = getAllItems();
+    items.forEach((item) => {
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td>${item.code}</td>
+            <td>${item.name}</td>
+            <td>${item.qty}</td>
+            <td>${item.price}</td>
+        `;
+
+        // Add click event listener to populate form fields
+        row.addEventListener("click", () => {
+            document.getElementById("item-code").value = item.code;
+            document.getElementById("item-name").value = item.name;
+            document.getElementById("item-qty").value = item.qty;
+            document.getElementById("item-price").value = item.price;
+
+            // Clear any existing error messages
+            document.getElementById("item-code-error").textContent = "";
+            document.getElementById("item-name-error").textContent = "";
+            document.getElementById("item-qty-error").textContent = "";
+            document.getElementById("item-price-error").textContent = "";
+
+            // Remove 'is-invalid' class from fields
+            document.getElementById("item-code").classList.remove("is-invalid");
+            document.getElementById("item-name").classList.remove("is-invalid");
+            document.getElementById("item-qty").classList.remove("is-invalid");
+            document.getElementById("item-price").classList.remove("is-invalid");
+
+            // Enable the "Save" button
+            document.getElementById("save-item").disabled = false;
+
+            console.log(`Row clicked: ${item.code}`);
+        });
+
+        itemTableBody.appendChild(row);
+    });
+}
+
+// Clear Item Form
+function clearItemForm() {
+    document.getElementById("item-code").value = "";
+    document.getElementById("item-name").value = "";
+    document.getElementById("item-qty").value = "";
+    document.getElementById("item-price").value = "";
+    document.getElementById("item-code-error").textContent = "";
+    document.getElementById("item-name-error").textContent = "";
+    document.getElementById("item-qty-error").textContent = "";
+    document.getElementById("item-price-error").textContent = "";
 }
