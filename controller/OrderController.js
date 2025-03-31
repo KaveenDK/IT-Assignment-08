@@ -10,29 +10,23 @@ export function populateCustomerDropdown() {
     $customerDropdown.append('<option value="">Select Customer</option>');
 
     customers.forEach((customer) => {
+        console.log("Adding Customer:", customer); // Debugging log
         $customerDropdown.append(`<option value="${customer.id}">${customer.id} - ${customer.name}</option>`);
     });
 }
 
 export function populateItemDropdown() {
-    console.log("Populating item dropdown...");
-    console.log("Items:", items);
-
-    const $itemDropdown = $("#order-item-code"); // Updated ID
+    const $itemDropdown = $("#order-item-code");
     $itemDropdown.empty();
     $itemDropdown.append('<option value="">Select Item Code</option>');
 
     items.forEach((item) => {
-        const option = `<option value="${item.code}">${item.code} - ${item.name}</option>`;
-        console.log("Adding option:", option); // Debugging log
-        $itemDropdown.append(option);
+        console.log("Adding Item:", item); // Debugging log
+        $itemDropdown.append(`<option value="${item.code}">${item.code} - ${item.name}</option>`);
     });
 }
 
 export function generateOrderId() {
-    console.log("Generating Order ID...");
-    console.log("Current Orders:", orders); // Debugging log
-
     if (orders.length === 0) {
         return "O-001"; // First order ID
     }
@@ -44,21 +38,59 @@ export function generateOrderId() {
 $(document).ready(() => {
     console.log("Order management script loaded...");
 
-    // Event listener for item dropdown change
+    // Event listener for Customer ID dropdown change
+    $("#order-customer-id").on("change", function () {
+        const customerId = $(this).val().split(" - ")[0];
+        const customer = customers.find((c) => c.id === customerId);
+
+        if (customer) {
+            $("#customer-name").val(customer.name);
+            $("#customer-address").val(customer.address);
+        } else {
+            $("#customer-name").val("");
+            $("#customer-address").val("");
+        }
+    });
+
+    // Event listener for Item Code dropdown change
     $("#order-item-code").on("change", function () {
-        const itemCode = $(this).val();
+        const itemCode = $(this).val().split(" - ")[0];
         const item = items.find((i) => i.code === itemCode);
-    
+
         if (item) {
             $("#item-name").val(item.name);
             $("#item-price").val(item.price.toFixed(2));
             $("#qty-on-hand").val(item.qty);
         } else {
-            // Clear fields if no item is selected
             $("#item-name").val("");
             $("#item-price").val("");
             $("#qty-on-hand").val("");
         }
+    });
+
+    // Event listener for Cash input to calculate balance
+    $("#cash").on("input", function () {
+        const cash = parseFloat($(this).val()) || 0;
+        const total = parseFloat($("#order-total").text()) || 0;
+        const discount = parseFloat($("#discount").val()) || 0;
+
+        const discountedTotal = total - (total * (discount / 100));
+        const balance = cash - discountedTotal;
+
+        $("#balance").val(balance.toFixed(2));
+    });
+
+    // Event listener for Discount input to update totals and balance
+    $("#discount").on("input", function () {
+        const cash = parseFloat($("#cash").val()) || 0;
+        const total = parseFloat($("#order-total").text()) || 0;
+        const discount = parseFloat($(this).val()) || 0;
+
+        const discountedTotal = total - (total * (discount / 100));
+        const balance = cash - discountedTotal;
+
+        $("#order-subtotal").text(`${discountedTotal.toFixed(2)} Rs`);
+        $("#balance").val(balance.toFixed(2));
     });
 
     function clearOrderForm() {
@@ -66,7 +98,7 @@ $(document).ready(() => {
         $("#order-customer-id").val("");
         $("#customer-name").val("");
         $("#customer-address").val("");
-        $("#item-code").val("");
+        $("#order-item-code").val("");
         $("#item-name").val("");
         $("#item-price").val("");
         $("#order-qty").val("");
@@ -80,7 +112,7 @@ $(document).ready(() => {
     }
 
     $("#add-order-item").on("click", () => {
-        const itemCode = $("#item-code").val();
+        const itemCode = $("#order-item-code").val().split(" - ")[0];
         const itemName = $("#item-name").val();
         const itemPrice = parseFloat($("#item-price").val());
         const qtyOnHand = parseInt($("#qty-on-hand").val());
@@ -144,7 +176,7 @@ $(document).ready(() => {
     }
 
     $("#place-order").on("click", () => {
-        const customerId = $("#order-customer-id").val();
+        const customerId = $("#order-customer-id").val().split(" - ")[0];
         const discount = parseFloat($("#discount").val()) || 0;
 
         const orderDetails = [];
