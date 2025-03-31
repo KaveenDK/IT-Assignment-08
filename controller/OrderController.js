@@ -5,7 +5,6 @@ import { OrderDetails } from "../model/OrderDetails.js";
 import { updateDashboard } from "./IndexController.js";
 
 export function populateCustomerDropdown() {
-    console.log("Populating customer dropdown...");
     const $customerDropdown = $("#order-customer-id");
     $customerDropdown.empty();
     $customerDropdown.append('<option value="">Select Customer</option>');
@@ -17,29 +16,51 @@ export function populateCustomerDropdown() {
 
 export function populateItemDropdown() {
     console.log("Populating item dropdown...");
-    const $itemDropdown = $("#item-code");
+    console.log("Items:", items);
+
+    const $itemDropdown = $("#order-item-code"); // Updated ID
     $itemDropdown.empty();
     $itemDropdown.append('<option value="">Select Item Code</option>');
 
     items.forEach((item) => {
-        $itemDropdown.append(`<option value="${item.code}">${item.code} - ${item.name}</option>`);
+        const option = `<option value="${item.code}">${item.code} - ${item.name}</option>`;
+        console.log("Adding option:", option); // Debugging log
+        $itemDropdown.append(option);
     });
+}
+
+export function generateOrderId() {
+    console.log("Generating Order ID...");
+    console.log("Current Orders:", orders); // Debugging log
+
+    if (orders.length === 0) {
+        return "O-001"; // First order ID
+    }
+    const lastOrder = orders[orders.length - 1];
+    const lastIdNum = parseInt(lastOrder.orderId.split("-")[1]);
+    return `O-${String(lastIdNum + 1).padStart(3, "0")}`;
 }
 
 $(document).ready(() => {
     console.log("Order management script loaded...");
 
-    // Generate Automatic Order ID
-    function generateOrderId() {
-        if (orders.length === 0) {
-            return "O-001";
+    // Event listener for item dropdown change
+    $("#order-item-code").on("change", function () {
+        const itemCode = $(this).val();
+        const item = items.find((i) => i.code === itemCode);
+    
+        if (item) {
+            $("#item-name").val(item.name);
+            $("#item-price").val(item.price.toFixed(2));
+            $("#qty-on-hand").val(item.qty);
+        } else {
+            // Clear fields if no item is selected
+            $("#item-name").val("");
+            $("#item-price").val("");
+            $("#qty-on-hand").val("");
         }
-        const lastOrder = orders[orders.length - 1];
-        const lastIdNum = parseInt(lastOrder.orderId.split("-")[1]);
-        return `O-${String(lastIdNum + 1).padStart(3, "0")}`;
-    }
+    });
 
-    // Clear Order Form
     function clearOrderForm() {
         $("#order-id").val(generateOrderId());
         $("#order-customer-id").val("");
@@ -58,35 +79,6 @@ $(document).ready(() => {
         $("#order-subtotal").text("00.00 Rs");
     }
 
-    // Handle Customer Dropdown Change
-    $("#order-customer-id").on("change", function () {
-        const customerId = $(this).val();
-        const customer = customers.find((c) => c.id === customerId);
-        if (customer) {
-            $("#customer-name").val(customer.name);
-            $("#customer-address").val(customer.address);
-        } else {
-            $("#customer-name").val("");
-            $("#customer-address").val("");
-        }
-    });
-
-    // Handle Item Dropdown Change
-    $("#item-code").on("change", function () {
-        const itemCode = $(this).val();
-        const item = items.find((i) => i.code === itemCode);
-        if (item) {
-            $("#item-name").val(item.name);
-            $("#item-price").val(item.price.toFixed(2));
-            $("#qty-on-hand").val(item.qty);
-        } else {
-            $("#item-name").val("");
-            $("#item-price").val("");
-            $("#qty-on-hand").val("");
-        }
-    });
-
-    // Add Item to Order Table
     $("#add-order-item").on("click", () => {
         const itemCode = $("#item-code").val();
         const itemName = $("#item-name").val();
@@ -132,13 +124,11 @@ $(document).ready(() => {
         updateOrderTotals();
     });
 
-    // Remove Item from Order Table
     $("#order-table").on("click", ".remove-order-item", function () {
         $(this).closest("tr").remove();
         updateOrderTotals();
     });
 
-    // Update Order Totals
     function updateOrderTotals() {
         let total = 0;
         $("#order-table tr").each(function () {
@@ -153,7 +143,6 @@ $(document).ready(() => {
         $("#order-subtotal").text(`${discountedTotal.toFixed(2)} Rs`);
     }
 
-    // Place Order
     $("#place-order").on("click", () => {
         const customerId = $("#order-customer-id").val();
         const discount = parseFloat($("#discount").val()) || 0;
@@ -201,7 +190,6 @@ $(document).ready(() => {
         });
     }
 
-    // Initial Setup
     populateCustomerDropdown();
     populateItemDropdown();
     clearOrderForm();

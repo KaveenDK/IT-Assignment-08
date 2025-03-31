@@ -1,4 +1,5 @@
 import { addItem, removeItem, updateItem, getAllItems } from "../db/DB.js";
+import { populateItemDropdown } from "./OrderController.js";
 import { updateDashboard } from "./IndexController.js";
 
 $(document).ready(() => {
@@ -44,8 +45,9 @@ $(document).ready(() => {
             if (result.success) {
                 alert(result.message);
                 renderItemTable();
+                populateItemDropdown(); // Refresh the dropdown
                 clearItemForm();
-                updateDashboard();
+                updateDashboard(); // Update the dashboard after adding an item
             } else {
                 alert(result.message);
             }
@@ -59,7 +61,8 @@ $(document).ready(() => {
         if (result.success) {
             alert(result.message);
             renderItemTable();
-            updateDashboard();
+            populateItemDropdown(); // Refresh the dropdown
+            updateDashboard(); // Update the dashboard after deleting an item
         } else {
             alert(result.message);
         }
@@ -91,8 +94,9 @@ $(document).ready(() => {
             if (result.success) {
                 alert(result.message);
                 renderItemTable();
+                populateItemDropdown(); // Refresh the dropdown
                 clearItemForm();
-                updateDashboard();
+                updateDashboard(); // Update the dashboard after updating an item
             } else {
                 alert(result.message);
             }

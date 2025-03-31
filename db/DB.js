@@ -46,8 +46,11 @@ export function addItem(code, name, qty, price) {
     if (items.some((item) => item.code === code)) {
         return { success: false, message: "Item code already exists!" };
     }
+    console.log("Adding Item:", { code, name, qty, price });
+    console.log("Updated Items:", items);
     const item = { code, name, qty: parseInt(qty), price: parseFloat(price) };
     items.push(item);
+    console.log("Updated Items:", items);
     return { success: true, message: "Item added successfully!" };
 }
 
@@ -80,8 +83,10 @@ export function getAllItems() {
 
 // Function to add an order
 export function addOrder(orderId, customerId, date, total, orderDetails) {
+    console.log("Adding Order:", { orderId, customerId, date, total, orderDetails });
     const order = { orderId, customerId, date, total, orderDetails };
     orders.push(order);
+    console.log("Updated Orders:", orders);
     return { success: true, message: "Order added successfully!" };
 }
 
@@ -99,6 +104,8 @@ export function removeOrder(orderId) {
 export function getAllOrders() {
     return orders;
 }
+
+console.log("Items Array:", items);
 
 // Export arrays for direct access if needed
 export { customers, items, orders };

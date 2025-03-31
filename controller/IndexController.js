@@ -1,5 +1,5 @@
 import { customers, items, orders } from "../db/DB.js";
-import { populateCustomerDropdown, populateItemDropdown } from "./OrderController.js";
+import { populateCustomerDropdown, populateItemDropdown, generateOrderId } from "./OrderController.js";
 
 export function updateDashboard() {
     const customerCount = customers.length;
@@ -59,8 +59,8 @@ $(document).ready(() => {
     function initializeOrderForm() {
         console.log("Initializing order form...");
         populateCustomerDropdown();
-        populateItemDropdown();
-        $("#order-id").val("");
+        populateItemDropdown(); // Ensure this is called
+        $("#order-id").val(generateOrderId());
         $("#order-customer-id").val("");
         $("#order-table").empty();
         $("#order-total").text("0.00 Rs");
