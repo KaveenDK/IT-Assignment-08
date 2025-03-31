@@ -10,7 +10,6 @@ export function populateCustomerDropdown() {
     $customerDropdown.append('<option value="">Select Customer</option>');
 
     customers.forEach((customer) => {
-        console.log("Adding Customer:", customer); // Debugging log
         $customerDropdown.append(`<option value="${customer.id}">${customer.id} - ${customer.name}</option>`);
     });
 }
@@ -21,7 +20,6 @@ export function populateItemDropdown() {
     $itemDropdown.append('<option value="">Select Item Code</option>');
 
     items.forEach((item) => {
-        console.log("Adding Item:", item); // Debugging log
         $itemDropdown.append(`<option value="${item.code}">${item.code} - ${item.name}</option>`);
     });
 }
@@ -118,8 +116,17 @@ $(document).ready(() => {
         const qtyOnHand = parseInt($("#qty-on-hand").val());
         const orderQty = parseInt($("#order-qty").val());
 
-        if (!itemCode || !orderQty || isNaN(orderQty) || orderQty <= 0 || orderQty > qtyOnHand) {
-            alert("Invalid item or quantity!");
+        // Validation for Order Quantity
+        if (!itemCode) {
+            alert("Please select an item!");
+            return;
+        }
+        if (!orderQty || isNaN(orderQty) || orderQty <= 0) {
+            alert("Invalid order quantity!");
+            return;
+        }
+        if (orderQty > qtyOnHand) {
+            alert("Order quantity exceeds available stock!");
             return;
         }
 
@@ -133,7 +140,7 @@ $(document).ready(() => {
             const newQty = parseInt($qtyCell.text()) + orderQty;
 
             if (newQty > qtyOnHand) {
-                alert("Total quantity exceeds available quantity.");
+                alert("Total quantity exceeds available stock!");
                 return;
             }
 
