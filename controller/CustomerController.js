@@ -1,70 +1,198 @@
-console.log("CustomerController.js is loaded.....");
+import { addCustomer, removeCustomer, updateCustomer, getAllCustomers } from "../db/DB.js";
 
-import { customers } from "../db/DB.js";
-import { Customer } from "../model/Customer.js";
+$(document).ready(() => {
+    console.log("Customer management script loaded...");
 
-// Add Customer
-export function addCustomer(id, name, address, salary) {
-    if (validateCustomer(id, name, address, salary)) {
-        if (!searchCustomer(id)) {
-            const newCustomer = new Customer(id, name, address, salary);
-            customers.push(newCustomer);
-            console.log("Customer added successfully:", newCustomer);
-            return { success: true, message: "Customer added successfully." };
-        } else {
-            return { success: false, message: "Customer ID already exists." };
+    // Function to render the customer table
+    function renderCustomerTable() {
+        const $customerTableBody = $("#customer-table");
+        $customerTableBody.empty();
+
+        const customers = getAllCustomers();
+        if (customers.length === 0) {
+            $customerTableBody.append("<tr><td colspan='5' class='text-center'>No customers found</td></tr>");
+            return;
         }
-    } else {
-        return { success: false, message: "Invalid customer data." };
+
+        customers.forEach((customer) => {
+            const row = `
+                <tr>
+                    <td>${customer.id}</td>
+                    <td>${customer.name}</td>
+                    <td>${customer.address}</td>
+                    <td>${customer.salary.toFixed(2)}</td>
+                    <td class="text-center">
+                        <button class="btn btn-warning btn-sm edit-customer" data-id="${customer.id}">Edit</button>
+                        <button class="btn btn-danger btn-sm delete-customer" data-id="${customer.id}">Delete</button>
+                    </td>
+                </tr>
+            `;
+            $customerTableBody.append(row);
+        });
     }
-}
 
-// Search Customer by ID
-export function searchCustomer(id) {
-    return customers.find(customer => customer.id === id);
-}
+    // Add Customer
+    $("#save-customer").on("click", () => {
+        const id = $("#customer-id").val().trim();
+        const name = $("#customer-name").val().trim();
+        const address = $("#customer-address").val().trim();
+        const salary = $("#customer-salary").val().trim();
 
-// Remove Customer
-export function removeCustomer(id) {
-    const index = customers.findIndex(customer => customer.id === id);
-    if (index !== -1) {
-        customers.splice(index, 1);
-        console.log("Customer removed successfully:", id);
-        return { success: true, message: "Customer removed successfully." };
-    } else {
-        return { success: false, message: "Customer not found." };
-    }
-}
-
-// Update Customer
-export function updateCustomer(id, newName, newAddress, newSalary) {
-    const customer = searchCustomer(id);
-    if (customer) {
-        if (validateCustomer(id, newName, newAddress, newSalary)) {
-            customer.name = newName;
-            customer.address = newAddress;
-            customer.salary = parseFloat(newSalary);
-            console.log("Customer updated successfully:", customer);
-            return { success: true, message: "Customer updated successfully." };
-        } else {
-            return { success: false, message: "Invalid customer data." };
+        if (validateCustomerForm(id, name, address, salary)) {
+            const result = addCustomer(id, name, address, salary);
+            if (result.success) {
+                alert(result.message);
+                renderCustomerTable();
+                clearCustomerForm();
+            } else {
+                alert(result.message);
+            }
         }
-    } else {
-        return { success: false, message: "Customer not found." };
+    });
+
+    // Delete Customer
+    $("#customer-table").on("click", ".delete-customer", function () {
+        const id = $(this).data("id");
+        const result = removeCustomer(id);
+        if (result.success) {
+            alert(result.message);
+            renderCustomerTable();
+        } else {
+            alert(result.message);
+        }
+    });
+
+    // Edit Customer
+    $("#customer-table").on("click", ".edit-customer", function () {
+        const id = $(this).data("id");
+        const customer = getAllCustomers().find((c) => c.id === id);
+        if (customer) {
+            $("#customer-id").val(customer.id).prop("disabled", true);
+            $("#customer-name").val(customer.name);
+            $("#customer-address").val(customer.address);
+            $("#customer-salary").val(customer.salary);
+            $("#update-customer").show();
+            $("#save-customer").hide();
+        }
+    });
+
+    // Update Customer
+    $("#update-customer").on("click", () => {
+        const id = $("#customer-id").val().trim();
+        const name = $("#customer-name").val().trim();
+        const address = $("#customer-address").val().trim();
+        const salary = $("#customer-salary").val().trim();
+
+        if (validateCustomerForm(id, name, address, salary)) {
+            const result = updateCustomer(id, name, address, salary);
+            if (result.success) {
+                alert(result.message);
+                renderCustomerTable();
+                clearCustomerForm();
+            } else {
+                alert(result.message);
+            }
+        }
+    });
+
+    // Clear Form
+    $("#clear-all-fields").on("click", () => {
+        clearCustomerForm();
+    });
+
+    // Function to clear the customer form
+    function clearCustomerForm() {
+        $("#customer-id").val("").prop("disabled", false);
+        $("#customer-name").val("");
+        $("#customer-address").val("");
+        $("#customer-salary").val("");
+        $("#update-customer").hide();
+        $("#save-customer").show();
+        $(".error").text("");
+        $(".form-control").removeClass("is-invalid");
     }
-}
 
-// Get All Customers
-export function getAllCustomers() {
-    return customers;
-}
+    // Function to validate customer form fields
+    function validateCustomerForm(id, name, address, salary) {
+        let isValid = true;
 
-// Validate Customer Fields
-function validateCustomer(id, name, address, salary) {
-    return (
-        /^C\d{2}-\d{3}$/.test(id) &&
-        /^.{5,20}$/.test(name) &&
-        /^.{7,}$/.test(address) &&
-        /^\d+(\.\d{2})?$/.test(salary)
-    );
-}
+        // Validate Customer ID
+        if (!/^C\d{2}-\d{3}$/.test(id)) {
+            $("#customer-id-error").text("Customer ID is required (Pattern: C00-000)");
+            $("#customer-id").addClass("is-invalid");
+            isValid = false;
+        } else {
+            $("#customer-id-error").text("");
+            $("#customer-id").removeClass("is-invalid");
+        }
+
+        // Validate Customer Name
+        if (!/^.{5,20}$/.test(name)) {
+            $("#customer-name-error").text("Customer Name must be 5-20 characters long.");
+            $("#customer-name").addClass("is-invalid");
+            isValid = false;
+        } else {
+            $("#customer-name-error").text("");
+            $("#customer-name").removeClass("is-invalid");
+        }
+
+        // Validate Customer Address
+        if (!/^.{7,}$/.test(address)) {
+            $("#customer-address-error").text("Customer Address must be at least 7 characters long.");
+            $("#customer-address").addClass("is-invalid");
+            isValid = false;
+        } else {
+            $("#customer-address-error").text("");
+            $("#customer-address").removeClass("is-invalid");
+        }
+
+        // Validate Customer Salary
+        if (!/^\d+(\.\d{2})?$/.test(salary)) {
+            $("#customer-salary-error").text("Customer Salary must be a valid number (e.g., 100.00).");
+            $("#customer-salary").addClass("is-invalid");
+            isValid = false;
+        } else {
+            $("#customer-salary-error").text("");
+            $("#customer-salary").removeClass("is-invalid");
+        }
+
+        return isValid;
+    }
+
+    // Dynamic validation for form fields
+    $("#customer-id").on("input", function () {
+        const id = $(this).val().trim();
+        if (/^C\d{2}-\d{3}$/.test(id)) {
+            $("#customer-id-error").text("");
+            $(this).removeClass("is-invalid");
+        }
+    });
+
+    $("#customer-name").on("input", function () {
+        const name = $(this).val().trim();
+        if (/^.{5,20}$/.test(name)) {
+            $("#customer-name-error").text("");
+            $(this).removeClass("is-invalid");
+        }
+    });
+
+    $("#customer-address").on("input", function () {
+        const address = $(this).val().trim();
+        if (/^.{7,}$/.test(address)) {
+            $("#customer-address-error").text("");
+            $(this).removeClass("is-invalid");
+        }
+    });
+
+    $("#customer-salary").on("input", function () {
+        const salary = $(this).val().trim();
+        if (/^\d+(\.\d{2})?$/.test(salary)) {
+            $("#customer-salary-error").text("");
+            $(this).removeClass("is-invalid");
+        }
+    });
+
+    // Initial Render
+    renderCustomerTable();
+    clearCustomerForm();
+});

@@ -280,26 +280,33 @@
     <section id="order-section" class="container mt-4 hidden">
       <h2 class="text-center mb-4">Order Manage</h2>
       <div class="row g-4">
+        <!-- Invoice Details -->
         <div class="col-md-4">
           <div class="card">
-            <div class="card-header bg-success text-white">Invoice Details</div>
+            <div class="card-header bg-success text-white fw-bold">
+              Invoice Details
+            </div>
             <div class="card-body">
               <form>
                 <div class="mb-3">
-                  <label for="order-id" class="form-label">Order ID</label>
+                  <label for="order-id" class="form-label fw-bold"
+                    >Order ID</label
+                  >
                   <input
                     type="text"
                     class="form-control"
                     id="order-id"
-                    disabled
+                    readonly
                   />
                 </div>
                 <div class="mb-3">
-                  <label for="order-date" class="form-label">Date</label>
+                  <label for="order-date" class="form-label fw-bold"
+                    >Date</label
+                  >
                   <input type="date" class="form-control" id="order-date" />
                 </div>
                 <div class="mb-3">
-                  <label for="order-customer-id" class="form-label"
+                  <label for="order-customer-id" class="form-label fw-bold"
                     >Customer ID</label
                   >
                   <select class="form-select" id="order-customer-id">
@@ -307,67 +314,90 @@
                   </select>
                 </div>
                 <div class="mb-3">
-                  <label for="customer-name" class="form-label">Name</label>
+                  <label for="customer-name" class="form-label fw-bold"
+                    >Name</label
+                  >
                   <input
                     type="text"
                     class="form-control"
                     id="customer-name"
-                    disabled
+                    readonly
                   />
                 </div>
                 <div class="mb-3">
-                  <label for="customer-address" class="form-label"
+                  <label for="customer-address" class="form-label fw-bold"
                     >Address</label
                   >
                   <input
                     type="text"
                     class="form-control"
                     id="customer-address"
-                    disabled
+                    readonly
                   />
                 </div>
               </form>
             </div>
           </div>
         </div>
+
+        <!-- Item Select -->
         <div class="col-md-4">
           <div class="card">
-            <div class="card-header bg-success text-white">Item Select</div>
+            <div class="card-header bg-success text-white fw-bold">
+              Item Select
+            </div>
             <div class="card-body">
               <form>
                 <div class="mb-3">
-                  <label for="item-code" class="form-label">Item Code</label>
+                  <label for="item-code" class="form-label fw-bold"
+                    >Item Code</label
+                  >
                   <select class="form-select" id="item-code">
                     <option>Select Item Code</option>
                   </select>
                 </div>
                 <div class="mb-3">
-                  <label for="item-name" class="form-label">Item Name</label>
+                  <label for="item-name" class="form-label fw-bold"
+                    >Item Name</label
+                  >
                   <input
                     type="text"
                     class="form-control"
                     id="item-name"
-                    disabled
+                    readonly
                   />
                 </div>
                 <div class="mb-3">
-                  <label for="item-price" class="form-label">Price</label>
+                  <label for="item-price" class="form-label fw-bold"
+                    >Price</label
+                  >
                   <input
                     type="text"
                     class="form-control"
                     id="item-price"
-                    disabled
+                    readonly
                   />
                 </div>
                 <div class="mb-3">
-                  <label for="order-qty" class="form-label"
+                  <label for="qty-on-hand" class="form-label fw-bold"
+                    >Qty On Hand</label
+                  >
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="qty-on-hand"
+                    readonly
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="order-qty" class="form-label fw-bold"
                     >Order Quantity</label
                   >
                   <input type="number" class="form-control" id="order-qty" />
                 </div>
                 <button
                   type="button"
-                  class="btn btn-primary"
+                  class="btn btn-primary w-100"
                   id="add-order-item"
                 >
                   Add Item
@@ -376,46 +406,56 @@
             </div>
           </div>
         </div>
+
+        <!-- Order Summary -->
         <div class="col-md-4">
           <div class="card">
-            <div class="card-header bg-success text-white">Summary</div>
+            <div class="card-header bg-success text-white fw-bold">Summary</div>
             <div class="card-body">
-              <p>
+              <p class="mt-3 fw-bold">
                 Total:
                 <span id="order-total" class="text-primary">00.00Rs/=</span>
               </p>
-              <p>
+              <p class="fw-bold">
                 SubTotal:
                 <span id="order-subtotal" class="text-danger">00.00Rs/=</span>
               </p>
               <div class="mb-3">
-                <label for="cash" class="form-label">Cash</label>
+                <label for="cash" class="form-label fw-bold">Cash</label>
                 <input type="number" class="form-control" id="cash" />
               </div>
               <div class="mb-3">
-                <label for="discount" class="form-label">Discount (%)</label>
+                <label for="discount" class="form-label fw-bold"
+                  >Discount (%)</label
+                >
                 <input type="number" class="form-control" id="discount" />
               </div>
               <div class="mb-3">
-                <label for="balance" class="form-label">Balance</label>
+                <label for="balance" class="form-label fw-bold">Balance</label>
                 <input
                   type="number"
                   class="form-control"
                   id="balance"
-                  disabled
+                  readonly
                 />
               </div>
-              <button type="button" class="btn btn-success" id="place-order">
+              <button
+                type="button"
+                class="btn btn-success w-100"
+                id="place-order"
+              >
                 Purchase
               </button>
             </div>
           </div>
         </div>
       </div>
+
+      <!-- Order Table -->
       <div class="row mt-4">
         <div class="col-12">
           <table class="table table-bordered">
-            <thead class="table-success">
+            <thead class="table-success text-center fw-bold">
               <tr>
                 <th>Item Code</th>
                 <th>Item Name</th>
@@ -431,7 +471,7 @@
     </section>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-    <script type="module" src="/js/script.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script type="module" src="/db/DB.js"></script>
     <script type="module" src="/controller/IndexController.js"></script>
     <script type="module" src="/controller/CustomerController.js"></script>

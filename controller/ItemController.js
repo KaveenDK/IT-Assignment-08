@@ -1,119 +1,202 @@
-console.log("ItemController.js is loaded.....");
+import { addItem, removeItem, updateItem, getAllItems } from "../db/DB.js";
+import { updateDashboard } from "./IndexController.js";
 
-import { Item } from "../model/Item.js";
-import { items } from "../db/DB.js";
+$(document).ready(() => {
+    console.log("Item management script loaded...");
 
-// === ITEM CONTROLLER ===
+    // Function to render the item table
+    function renderItemTable() {
+        const $itemTableBody = $("#item-table");
+        $itemTableBody.empty();
 
-// Add Item
-export function addItem(code, name, qty, price) {
-    if (validateItemForm()) {
-        if (!searchItem(code)) {
-            const newItem = new Item(code, name, qty, price);
-            items.push(newItem);
-            console.log("Items after adding:", items);
-            return { success: true, message: "Item added successfully." };
-        } else {
-            return { success: false, message: "Item Code already exists." };
+        const items = getAllItems();
+        if (items.length === 0) {
+            $itemTableBody.append("<tr><td colspan='5' class='text-center'>No items found</td></tr>");
+            return;
         }
-    } else {
-        return { success: false, message: "Invalid item data." };
+
+        items.forEach((item) => {
+            const row = `
+                <tr>
+                    <td>${item.code}</td>
+                    <td>${item.name}</td>
+                    <td>${item.qty}</td>
+                    <td>${item.price.toFixed(2)}</td>
+                    <td class="text-center">
+                        <button class="btn btn-warning btn-sm edit-item" data-code="${item.code}">Edit</button>
+                        <button class="btn btn-danger btn-sm delete-item" data-code="${item.code}">Delete</button>
+                    </td>
+                </tr>
+            `;
+            $itemTableBody.append(row);
+        });
     }
-}
 
-// Search Item by Code
-export function searchItem(code) {
-    return items.find(item => item.code === code);
-}
+    // Add Item
+    $("#save-item").on("click", () => {
+        const code = $("#item-code").val().trim();
+        const name = $("#item-name").val().trim();
+        const qty = $("#item-qty").val().trim();
+        const price = $("#item-price").val().trim();
 
-// Update Item
-export function updateItem(code, newName, newQty, newPrice) {
-    const item = searchItem(code);
-    if (item) {
-        if (validateItemForm()) {
-            item.name = newName;
-            item.qty = parseInt(newQty);
-            item.price = parseFloat(newPrice);
-            console.log("Item updated successfully:", item);
-            return { success: true, message: "Item updated successfully." };
-        } else {
-            return { success: false, message: "Invalid item data." };
+        if (validateItemForm(code, name, qty, price)) {
+            const result = addItem(code, name, qty, price);
+            if (result.success) {
+                alert(result.message);
+                renderItemTable();
+                clearItemForm();
+                updateDashboard();
+            } else {
+                alert(result.message);
+            }
         }
-    } else {
-        return { success: false, message: "Item not found." };
-    }
-}
+    });
 
-// Remove Item
-export function removeItem(code) {
-    const index = items.findIndex(item => item.code === code);
-    if (index !== -1) {
-        items.splice(index, 1);
-        console.log("Item removed successfully:", code);
-        return { success: true, message: "Item removed successfully." };
-    } else {
-        return { success: false, message: "Item not found." };
-    }
-}
+    // Delete Item
+    $("#item-table").on("click", ".delete-item", function () {
+        const code = $(this).data("code");
+        const result = removeItem(code);
+        if (result.success) {
+            alert(result.message);
+            renderItemTable();
+            updateDashboard();
+        } else {
+            alert(result.message);
+        }
+    });
 
-// ItemController.js
-export function getAllItems() {
-    console.log("Items in getAllItems:", items);
-    return items;
-}
+    // Edit Item
+    $("#item-table").on("click", ".edit-item", function () {
+        const code = $(this).data("code");
+        const item = getAllItems().find((i) => i.code === code);
+        if (item) {
+            $("#item-code").val(item.code).prop("disabled", true);
+            $("#item-name").val(item.name);
+            $("#item-qty").val(item.qty);
+            $("#item-price").val(item.price);
+            $("#update-item").show();
+            $("#save-item").hide();
+        }
+    });
 
-// Validate Item Form Fields
-export function validateItemForm() {
-    const code = document.getElementById("item-code").value.trim();
-    const name = document.getElementById("item-name").value.trim();
-    const qty = document.getElementById("item-qty").value.trim();
-    const price = document.getElementById("item-price").value.trim();
+    // Update Item
+    $("#update-item").on("click", () => {
+        const code = $("#item-code").val().trim();
+        const name = $("#item-name").val().trim();
+        const qty = $("#item-qty").val().trim();
+        const price = $("#item-price").val().trim();
 
-    let isValid = true;
+        if (validateItemForm(code, name, qty, price)) {
+            const result = updateItem(code, name, qty, price);
+            if (result.success) {
+                alert(result.message);
+                renderItemTable();
+                clearItemForm();
+                updateDashboard();
+            } else {
+                alert(result.message);
+            }
+        }
+    });
 
-    // Validate Item Code
-    if (!/^I\d{2}-\d{3}$/.test(code)) {
-        document.getElementById("item-code-error").textContent =
-            "Item Code is a required field - Pattern: I00-000";
-        document.getElementById("item-code").classList.add("is-invalid");
-        isValid = false;
-    } else {
-        document.getElementById("item-code-error").textContent = "";
-        document.getElementById("item-code").classList.remove("is-invalid");
-    }
+    // Clear Form
+    $("#clear-all-items").on("click", () => {
+        clearItemForm();
+    });
 
-    // Validate Item Name
-    if (!/^.{3,50}$/.test(name)) {
-        document.getElementById("item-name-error").textContent =
-            "Item Name is a required field: Minimum 3, Max 50 characters";
-        document.getElementById("item-name").classList.add("is-invalid");
-        isValid = false;
-    } else {
-        document.getElementById("item-name-error").textContent = "";
-        document.getElementById("item-name").classList.remove("is-invalid");
-    }
-
-    // Validate Item Qty
-    if (!/^\d+$/.test(qty) || parseInt(qty) <= 0) {
-        document.getElementById("item-qty-error").textContent =
-            "Item Qty is a required field: Must be a positive number";
-        document.getElementById("item-qty").classList.add("is-invalid");
-        isValid = false;
-    } else {
-        document.getElementById("item-qty-error").textContent = "";
-        document.getElementById("item-qty").classList.remove("is-invalid");
-    }
-
-    // Validate Item Price
-    if (!/^\d+(\.\d{2})?$/.test(price) || parseFloat(price) <= 0) {
-        document.getElementById("item-price-error").textContent =
-            "Item Price is a required field: Pattern 100.00 or 100";
-        document.getElementById("item-price").classList.add("is-invalid");
-        isValid = false;
-    } else {
-        document.getElementById("item-price-error").textContent = "";
-        document.getElementById("item-price").classList.remove("is-invalid");
+    // Function to clear the item form
+    function clearItemForm() {
+        $("#item-code").val("").prop("disabled", false);
+        $("#item-name").val("");
+        $("#item-qty").val("");
+        $("#item-price").val("");
+        $("#update-item").hide();
+        $("#save-item").show();
+        $(".error").text("");
+        $(".form-control").removeClass("is-invalid");
     }
 
-    return isValid;
-}
+    // Function to validate item form fields
+    function validateItemForm(code, name, qty, price) {
+        let isValid = true;
+
+        // Validate Item Code
+        if (!/^I\d{2}-\d{3}$/.test(code)) {
+            $("#item-code-error").text("Item Code is required (Pattern: I00-000)");
+            $("#item-code").addClass("is-invalid");
+            isValid = false;
+        } else {
+            $("#item-code-error").text("");
+            $("#item-code").removeClass("is-invalid");
+        }
+
+        // Validate Item Name
+        if (!/^.{3,50}$/.test(name)) {
+            $("#item-name-error").text("Item Name must be 3-50 characters long.");
+            $("#item-name").addClass("is-invalid");
+            isValid = false;
+        } else {
+            $("#item-name-error").text("");
+            $("#item-name").removeClass("is-invalid");
+        }
+
+        // Validate Item Quantity
+        if (!/^\d+$/.test(qty) || parseInt(qty) <= 0) {
+            $("#item-qty-error").text("Item Quantity must be a positive number.");
+            $("#item-qty").addClass("is-invalid");
+            isValid = false;
+        } else {
+            $("#item-qty-error").text("");
+            $("#item-qty").removeClass("is-invalid");
+        }
+
+        // Validate Item Price
+        if (!/^\d+(\.\d{2})?$/.test(price) || parseFloat(price) <= 0) {
+            $("#item-price-error").text("Item Price must be a valid number (e.g., 100.00).");
+            $("#item-price").addClass("is-invalid");
+            isValid = false;
+        } else {
+            $("#item-price-error").text("");
+            $("#item-price").removeClass("is-invalid");
+        }
+
+        return isValid;
+    }
+
+    // Dynamic validation for form fields
+    $("#item-code").on("input", function () {
+        const code = $(this).val().trim();
+        if (/^I\d{2}-\d{3}$/.test(code)) {
+            $("#item-code-error").text("");
+            $(this).removeClass("is-invalid");
+        }
+    });
+
+    $("#item-name").on("input", function () {
+        const name = $(this).val().trim();
+        if (/^.{3,50}$/.test(name)) {
+            $("#item-name-error").text("");
+            $(this).removeClass("is-invalid");
+        }
+    });
+
+    $("#item-qty").on("input", function () {
+        const qty = $(this).val().trim();
+        if (/^\d+$/.test(qty) && parseInt(qty) > 0) {
+            $("#item-qty-error").text("");
+            $(this).removeClass("is-invalid");
+        }
+    });
+
+    $("#item-price").on("input", function () {
+        const price = $(this).val().trim();
+        if (/^\d+(\.\d{2})?$/.test(price) && parseFloat(price) > 0) {
+            $("#item-price-error").text("");
+            $(this).removeClass("is-invalid");
+        }
+    });
+
+    // Initial Render
+    renderItemTable();
+    clearItemForm();
+});
